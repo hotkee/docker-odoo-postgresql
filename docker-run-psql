@@ -1,0 +1,39 @@
+#!/bin/bash
+readonly RED="\e[31m"
+readonly YELLOW="\e[33m"
+readonly GREEN="\e[32m"
+readonly STD="\e[0m"
+
+if [ $# -lt 1 ]
+  then
+    echo -e "${RED}Error! Too few arguments supplied!"
+    echo -e "${STD}Command: docker-run-psql <container-name> [hostname]"
+    exit 1
+fi
+
+if [ $# -lt 2 ]
+  then
+    HNAME="odoopsql"
+  else
+    HNAME=$2
+fi
+
+# Read IP address for port sharing
+DOCKERIP=$(/sbin/ip route|awk '/docker0/ { print $NF }')
+
+# Create the container
+docker run -d -p ${DOCKERIP}:5432:5432 --name $1 jamotion/odoo-postgresql:rackspace
+
+# Add the container's IP as local host name
+IPADDR=$(docker inspect --format='{{ .NetworkSettings.IPAddress }}' $1)
+
+NAMEEXIST=$(grep $HNAME /etc/hosts | awk '{print 1}')
+IPEXIST=$(grep $IPADDR /etc/hosts | awk '{print 1}')
+
+if [ "$NAMEEXIST" == "1" ] || [ "$IPEXIST" == "1" ]
+  then
+    echo -e "${YELLOW}The IP address or hostname is already set in /etc/hosts!"
+    echo -e "${STD}Please check and set the hostname manually"
+  else
+    echo "$IPADDR $HNAME" >> /etc/hosts
+fi
