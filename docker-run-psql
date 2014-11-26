@@ -13,7 +13,7 @@ fi
 
 if [ $# -lt 2 ]
   then
-    HNAME="odoopsql"
+    HNAME=$1
   else
     HNAME=$2
 fi
