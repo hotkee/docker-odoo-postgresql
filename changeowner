@@ -1,0 +1,24 @@
+#!/bin/bash
+DBNAME=$1
+NEWOWNER=$2
+echo "Changing owner of all objects in (localhost) $DBNAME to $NEWOWNER"
+echo "Will log in to postgres. pg_hba.conf should enable ident authentication to postgres user for all databases"
+read -p "Press any key to continue" -n1 -s
+
+for tbl in `psql -U postgres -qAt -c "select tablename from pg_tables where schemaname = 'public';" $DBNAME` ; do
+  psql -U postgres -c "alter table $tbl owner to $NEWOWNER" $DBNAME
+done
+
+for tbl in `psql -U postgres -qAt -c "select sequence_name from information_schema.sequences where sequence_schema =
+ 'public';" $DBNAME` ; do
+  sudo psql -U postgres -c "alter sequence $tbl owner to $NEWOWNER" $DBNAME
+done
+
+for tbl in `psql -U postgres -qAt -c "select table_name from information_schema.views where table_schema = 'public';
+" $DBNAME` ; do
+  psql -U postgres -c "alter view $tbl owner to $NEWOWNER" $DBNAME
+done
+
+echo "Change db owner"
+psql -U postgres -c "alter database $DBNAME owner to $NEWOWNER"
+
