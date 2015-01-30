@@ -22,7 +22,7 @@ fi
 DOCKERIP=$(/sbin/ip route|awk '/docker0/ { print $NF }')
 
 # Create the container
-docker run -d -p ${DOCKERIP}:5432:5432 --name $1 jamotion/odoo-postgresql:rackspace
+docker run -d -p ${DOCKERIP}:5432:5432 --name $1 jamotion/odoo-postgresql:latest
 
 # Add the container's IP as local host name
 IPADDR=$(docker inspect --format='{{ .NetworkSettings.IPAddress }}' $1)

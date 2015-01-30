@@ -1,0 +1,9 @@
+#!/bin/bash
+DIR="$PWD"
+
+if [ -f /usr/local/bin/docker-run-psql ]
+  then
+    rm /usr/local/bin/docker-run-psql
+fi
+
+ln -s ${DIR}/docker-run-psql /usr/local/bin/docker-run-psql
