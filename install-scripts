@@ -5,5 +5,9 @@ if [ -f /usr/local/bin/docker-run-psql ]
   then
     rm /usr/local/bin/docker-run-psql
 fi
-
+if [ -f /usr/local/bin/docker-del-psql ]
+  then
+    rm /usr/local/bin/docker-del-psql
+fi
 ln -s ${DIR}/docker-run-psql /usr/local/bin/docker-run-psql
+ln -s ${DIR}/docker-del-psql /usr/local/bin/docker-del-psql

@@ -1,0 +1,45 @@
+#!/bin/bash
+readonly RED="\e[31m"
+readonly YELLOW="\e[33m"
+readonly GREEN="\e[32m"
+readonly STD="\e[0m"
+
+if [ $# -lt 1 ]
+  then
+    echo -e "${RED}Error! Too few arguments supplied!"
+    echo -e "${STD}Command: docker-run-psql <container-name> [hostname]"
+    exit 1
+fi
+
+if [ $# -lt 2 ]
+  then
+    HNAME=$1
+  else
+    HNAME=$2
+fi
+
+# Read IP address for port sharing
+DOCKERIP=$(/sbin/ip route|awk '/docker0/ { print $NF }')
+
+# Remove the container
+echo -e "${YELLOW}Removing the container ${HNAME}...${STD}"
+read -r -p "Are you sure? [y/N] " response
+response=${response,,}
+if [[ $response =~ ^(yes|y)$ ]]
+  then
+    docker rm -f $1
+    echo -e "${GREEN}Container ${HNAME} removed${STD}"
+  else
+    echo -e "${STD}nothing deleted"
+    exit 0
+fi
+
+# Remove the container's local host name
+NAMEEXIST=$(grep $HNAME /etc/hosts | awk '{print 1}')
+
+if [ "$NAMEEXIST" == "1" ]
+  then
+    echo -e "${YELLOW}Removing host entry in /etc/hosts...${STD}"
+    sed -i "/${HNAME}/d" /etc/hosts
+    echo -e "${GREEN}Entry removed${STD}"
+fi
