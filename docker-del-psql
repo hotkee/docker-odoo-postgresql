@@ -11,6 +11,7 @@ if [ $# -lt 1 ]
     exit 1
 fi
 
+CONT=$1
 if [ $# -lt 2 ]
   then
     HNAME=$1
@@ -22,13 +23,13 @@ fi
 DOCKERIP=$(/sbin/ip route|awk '/docker0/ { print $NF }')
 
 # Remove the container
-echo -e "${YELLOW}Removing the container ${HNAME}...${STD}"
+echo -e "${YELLOW}Removing the container ${CONT}...${STD}"
 read -r -p "Are you sure? [y/N] " response
 response=${response,,}
 if [[ $response =~ ^(yes|y)$ ]]
   then
-    docker rm -f $1
-    echo -e "${GREEN}Container ${HNAME} removed${STD}"
+    docker rm -f ${CONT}
+    echo -e "${GREEN}Container ${CONT} removed${STD}"
   else
     echo -e "${STD}nothing deleted"
     exit 0
